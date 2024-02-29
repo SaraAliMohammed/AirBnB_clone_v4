@@ -5,10 +5,12 @@ from flask import jsonify, abort, request, make_response
 from models import storage
 from models.state import State
 from models.city import City
+from flasgger.utils import swag_from
 
 
 @app_views.route('/states/<string:state_id>/cities', methods=['GET'],
                  strict_slashes=False)
+@swag_from('documentation/city/cities_by_state.yml', methods=['GET'])
 def get_cities_in_state(state_id):
     """ get all cities in state """
     state = storage.get(State, state_id)
@@ -20,6 +22,7 @@ def get_cities_in_state(state_id):
 
 @app_views.route('/cities/<string:city_id>', methods=['GET'],
                  strict_slashes=False)
+@swag_from('documentation/city/get_city.yml', methods=['GET'])
 def get_city(city_id):
     """ get city by id"""
     city = storage.get(City, city_id)
@@ -30,6 +33,7 @@ def get_city(city_id):
 
 @app_views.route('/cities/<string:city_id>', methods=['DELETE'],
                  strict_slashes=False)
+@swag_from('documentation/city/delete_city.yml', methods=['DELETE'])
 def del_city(city_id):
     """ delete city by id"""
     city = storage.get(City, city_id)
@@ -42,6 +46,7 @@ def del_city(city_id):
 
 @app_views.route('states/<string:state_id>/cities', methods=['POST'],
                  strict_slashes=False)
+@swag_from('documentation/city/post_city.yml', methods=['POST'])
 def create_city(state_id):
     """ create new instance """
     state = storage.get(State, state_id)
@@ -60,6 +65,7 @@ def create_city(state_id):
 
 @app_views.route('/cities/<string:city_id>', methods=['PUT'],
                  strict_slashes=False)
+@swag_from('documentation/city/put_city.yml', methods=['PUT'])
 def put_city(city_id):
     """ update method """
     if not request.is_json:

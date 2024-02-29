@@ -4,9 +4,11 @@ from api.v1.views import app_views
 from flask import jsonify, abort, request, make_response
 from models import storage
 from models.user import User
+from flasgger.utils import swag_from
 
 
 @app_views.route('/users', methods=['GET'], strict_slashes=False)
+@swag_from('documentation/user/all_users.yml')
 def get_all_users():
     """ get users by id"""
     all_list = [obj.to_dict() for obj in storage.all(User).values()]
@@ -15,6 +17,7 @@ def get_all_users():
 
 @app_views.route('/users/<string:user_id>', methods=['GET'],
                  strict_slashes=False)
+@swag_from('documentation/user/get_user.yml', methods=['GET'])
 def get_user(user_id):
     """ get user by id"""
     user = storage.get(User, user_id)
@@ -25,6 +28,7 @@ def get_user(user_id):
 
 @app_views.route('/users/<string:user_id>', methods=['DELETE'],
                  strict_slashes=False)
+@swag_from('documentation/user/delete_user.yml', methods=['DELETE'])
 def del_user(user_id):
     """ delete user by id"""
     user = storage.get(User, user_id)
@@ -37,6 +41,7 @@ def del_user(user_id):
 
 @app_views.route('/users/', methods=['POST'],
                  strict_slashes=False)
+@swag_from('documentation/user/post_user.yml', methods=['POST'])
 def create_obj_user():
     """ create new instance """
     if not request.is_json:
@@ -53,6 +58,7 @@ def create_obj_user():
 
 @app_views.route('/users/<string:user_id>', methods=['PUT'],
                  strict_slashes=False)
+@swag_from('documentation/user/put_user.yml', methods=['PUT'])
 def put_user(user_id):
     """ Update user  """
     if not request.is_json:
