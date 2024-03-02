@@ -119,7 +119,7 @@ document.ready(function () {
                 ${place.description}
               </div>
               <div class="reviews" data-place="${place.id}">
-                <h2>Reviews: <span id="showReviews">show</span></h2>
+                <h2></h2>
                 <ul></ul>
               </div>
             </article>`
