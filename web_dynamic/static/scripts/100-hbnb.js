@@ -1,16 +1,38 @@
 document.ready(function () {
+  const HOST = 'http://0.0.0.1:5001';
   const amenities = {};
-  $('.amenities li input[type=checkbox]').change(function () {
-    if (this.checked) {
-      amenities[this.dataset.name] = this.dataset.id;
-    } else {
-      delete amenities[this.dataset.name];
+  const cities = {};
+  const states = {};
+  $('ul li input[type=checkbox]').change(function (ev) {
+    const el = ev.target;
+    let filterType;
+    switch (el.id) {
+      case 'state_filter':
+        filterType = states;
+        break;
+      case 'city_filter':
+        filterType = cities;
+        break;
+      case 'amenity_filter':
+        filterType = amenities;
+        break;
     }
-    $('.amenities h4').text(Object.keys(amenities).sort().join(', '));
+    if (el.checked) {
+      filterType[this.dataset.name] = el.dataset.id;
+    } else {
+      delete filterType[el.dataset.name];
+    }
+    if (el.id === 'amenity_filter') {
+      $('.amenities h4').text(Object.keys(amenities).sort().join(', '));
+    } else {
+      $('.locations h4').text(
+        Object.keys(Object.assign({}, states, cities)).sort().join(', ')
+      );
+    }
   });
 
   // get status of API
-  $.getJSON('http://0.0.0.0:5001/api/v1/status/', (data) => {
+  $.getJSON(`${HOST}/api/v1/status/`, (data) => {
     if (data.status === 'OK') {
       $('div#api_status').addClass('available');
     } else {
@@ -21,13 +43,13 @@ document.ready(function () {
   // fetch data about places
 
   $.post({
-    url: 'http://0.0.0.0:5001/api/v1/places_search',
+    url: `${HOST}/api/v1/places_search`,
     data: JSON.stringify({}),
     headers: {
       'Content-Type': 'application/json'
     },
     success: (data) => {
-      data.forEach((place) =>
+      data.forEach((place) => {
         $('section.places').append(
           `<article>
              <div class="title_box">
@@ -49,8 +71,8 @@ document.ready(function () {
                ${place.description}
              </div>
            </article>`
-        )
-      );
+        );
+      });
     },
     dataType: 'json'
   });
@@ -91,59 +113,16 @@ document.ready(function () {
                 <div class="number_bathrooms">${
                   place.number_bathrooms
                   } Bathroom${place.number_bathrooms !== 1 ? 's' : ''}
-		</div>
+                </div>
               </div> 
               <div class="description">
                 ${place.description}
               </div>
-              <div class="reviews" data-place="${place.id}">
-                <h2></h2>
-                <ul></ul>
-              </div>
             </article>`
           );
-          fetchReviews(place.id);
         });
       },
       dataType: 'json'
     });
-  }
-
-  function fetchReviews (placeId) {
-    $.getJSON(
-      `${HOST}/api/v1/places/${placeId}/reviews`,
-      (data) => {
-        $(`.reviews[data-place="${placeId}"] h2`)
-          .text('test')
-          .html(`${data.length} Reviews <span id="toggle_review">show</span>`);
-        $(`.reviews[data-place="${placeId}"] h2 #toggle_review`).bind(
-          'click', { placeId },
-          function (e) {
-            const rev = $(`.reviews[data-place="${e.data.placeId}"] ul`);
-            if (rev.css('display') === 'none') {
-              rev.css('display', 'block');
-              data.forEach((r) => {
-                $.getJSON(
-                    `${HOST}/api/v1/users/${r.user_id}`,
-                    (u) =>
-                      $('.reviews ul').append(`
-                          <li>
-                            <h3>From ${u.first_name + ' ' + u.last_name} the ${
-                              r.created_at
-                            }</h3>
-                            <p>${r.text}</p>
-                          </li>`
-                      ),
-                    'json'
-                );
-              });
-            } else {
-              rev.css('display', 'none');
-            }
-          }
-        );
-      },
-      'json'
-    );
   }
 });
