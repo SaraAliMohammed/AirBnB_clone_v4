@@ -28,7 +28,7 @@ document.ready(function () {
       'Content-Type': 'application/json'
     },
     success: (data) => {
-      data.forEach((place) =>
+      data.forEach((place) => {
         $('section.places').append(
           `<article>
              <div class="title_box">
@@ -50,8 +50,8 @@ document.ready(function () {
                ${place.description}
              </div>
            </article>`
-        )
-      );
+        );
+      });
     },
     dataType: 'json'
   });
@@ -88,7 +88,7 @@ document.ready(function () {
                 <div class="number_bathrooms">${
                   place.number_bathrooms
                   } Bathroom${place.number_bathrooms !== 1 ? 's' : ''}
-		</div>
+                </div>
               </div> 
               <div class="description">
                 ${place.description}
